@@ -356,5 +356,4 @@ input[type="submit"]:focus,
 input[type="submit"] {
   outline: none;
   box-shadow: none;
-  border: 3px white solid;
 }

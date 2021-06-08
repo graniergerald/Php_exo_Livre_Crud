@@ -11,15 +11,15 @@
   </head>
   <body>
     <?php include "php/main.php"; ?>
+
+    <?php include "Lien_header_redirection.php"; ?>
     
 
     <!-- READBOOKS -->
     <div class="ReadBooks"> 
       <h1>Read de la BDD</h1> 
       <?php AffichageTableauAssoc($ReadBook) ?>
-      <p>Une envie, un besoin de changer la carte des livres ? <a href="cud.php">C'est par ici</a></p>
     </div>
-
     
   </body>
 </html>

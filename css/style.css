@@ -48,3 +48,8 @@ input[type="submit"]:active {
   transition: all ease-in-out;
   background-color: #373941;
 }
+
+.RedirectionLivreInscriptionLogin {
+  display: flex;
+  justify-content: space-between;
+}

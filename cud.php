@@ -12,6 +12,8 @@
     <body>
         <?php include "php/main.php"; ?>
 
+        <?php include "Lien_header_redirection.php"; ?>
+
     <!-----------CREATE BOOKS ----------->
     <div class="CreateBooks">
       <form class="InsertBook" method="post" action="">
@@ -54,28 +56,23 @@
 
 
     <!-- UPDATE AND DELETE BOOKS -->
-    <div class="UpdateBooks"> 
+    <div id="UpdateBooks"> 
       <h1>Update & Delete de la BDD</h1> 
       
-      <label for="Book-Select">Selectionner un livre à modifier:</label>
+      <form action="">
+        <label for="Book-Select">Selectionner un livre à modifier:</label>
+          <select name="BookSelect" id="book-select">
+            <option value="">--Please choose a book to update--</option>
+            <?php selectBDD($ReadBookGlobalWithId) ?>
+            <input type="submit" id="SelectBook" value="Selectionner ce livre">
+          </select>
+      </form>
 
-      
-        <select name="BookSelect" id="book-select">
-          <option value="">--Please choose a book to update--</option>
-          <?php selectBDD($ReadBookGlobalWithId) ?>
-        </select>
-      
-
-        <?php if ($_POST['BookSelect'] == 'IdLivre_n°1') {
-            echo 'meow';
-        } else { echo 'meowfois2';} ?>
-        
-
-      <?php //$book = select_book_id($id); ?>
-      <?php ReadFormForUpdateAndDelete($ReadBookGlobalWithId) ?>
+    
+      <?php ReadFormForUpdateAndDelete() ?>
     </div>
 
-    <!--------------------------> 
-   
+    
+    <script src="js/index.js"></script>
     </body>
 </html>

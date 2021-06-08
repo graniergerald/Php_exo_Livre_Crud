@@ -150,15 +150,40 @@ function ReadBookGlobalwithId() {
 
 $ReadBookGlobalWithId = ReadBookGlobalwithId();
 
-///////FUNCTION UPDATE
-function UpdateBookGlobal() {
+function ReadBookById($id) {
 
     $dbco;
     
     Connexion($dbco);
 
     try {
-        $sth = $dbco->prepare("UPDATE car 
+        $sth = $dbco->prepare("SELECT * FROM livrelibrairie1 WHERE id=:id") ;
+        $sth->bindValue(':id', $id, PDO::PARAM_INT);
+        $sth->execute();
+        $ReadBookById = $sth->fetch(PDO::FETCH_ASSOC);
+        
+            
+        return $ReadBookById;
+            
+    }
+
+    catch(PDOException $e){
+        echo "Erreur :" .$e->getMessage();
+
+    }
+};
+
+$ReadBookById = ReadBookById($id);
+
+///////FUNCTION UPDATE
+function UpdateBookGlobal($title, $description, $date, $auteur, $prix, $image, $id) {
+
+    $dbco;
+    
+    Connexion($dbco);
+
+    try {
+        $sth = $dbco->prepare("UPDATE livrelibrairie1 
         SET title = :title, description = :description, date = :date, auteur = :auteur, prix = :prix, image = :image WHERE id = :id");
 
         $sth->bindValue(':title', $title, PDO::PARAM_STR);
@@ -167,6 +192,7 @@ function UpdateBookGlobal() {
         $sth->bindValue(':auteur', $auteur, PDO::PARAM_STR);
         $sth->bindValue(':prix', $prix, PDO::PARAM_INT);
         $sth->bindValue(':image', $image, PDO::PARAM_INT);
+        $sth->bindValue(':id', $id, PDO::PARAM_INT);
         $sth->execute();
             
     }
@@ -189,65 +215,80 @@ function selectBDD ($NomArray) {
             }
             elseif ($keyb == "title") {
 
-                echo '<option value="IdLivre_n°'.$idBook.'">'.$valueb.'</option>';
+                echo '<option value="'.$idBook.'">'.$valueb.'</option>';
             }
         }
 }
 
 };
 
-function testSelectBDD () {
-    echo $_POST['BookSelect'];
+function ReadFormForUpdateAndDelete() {
+   
+    //On recup les données selectionné de : function selectBDD
+    if(isset($_GET['BookSelect'])) {     //Modif le GET et reprendre la fonction pour lié un input select et afficher un form :)
+        $id = $_GET['BookSelect'];
+        $book = ReadBookById($id);
+
+        echo '<form class="UpdateOrDeleteBook" method="post" action="php/UpdateOrDelete.php">';
+        //on affiche le tableaux selectioné en fonction de ce qui est sélectionné ( id )
+        foreach($book as $key=>$value) {
+
+                    // Pour afficher l'id du livre mais empecher sa modification
+                    if($key =='id'){
+                        echo 'L\'id du livre est le numéro ' .$value ;
+
+                        echo '
+                        <p>
+                        <label for="Update' .$key. 'Book_n°'.$id.'"></label>
+                        <input type="hidden" name="Update' .$key. 'Book_n°'.$id.'" id="Update' .$key. 'Book_n°'.$id.'" maxlength="250" size="30" value="'.$value.'" required>
+                        </p>';
+                    }
+    
+                    elseif($key == 'date'){
+                        echo '
+                        <p>
+                        <label for="Update' .$key. 'Book_n°'.$id.'">'.$key. '</label>
+                        <input type="date" name="Update' .$key. 'Book_n°'.$id.'" id="Update' .$key. 'Book_n°'.$id.'" maxlength="250" size="30" value="'.$value.'" required>
+                        </p>';   
+                    }
+                    //elseif pour faire un input de type number
+                    elseif($key == 'prix'){
+                        echo '
+                        <p>
+                        <label for="Update' .$key. 'Book_n°'.$id.'">'.$key. '</label>
+                        <input type="number" name="Update' .$key. 'Book_n°'.$id.'" id="Update' .$key. 'Book_n°'.$id.'" maxlength="250" size="30" value="'.$value.'" required>
+                        </p>';
+                    }
+                    //elseif pour faire un input de type file pour le fichier image :) . 
+                    //Non fonctionnel à cause du Required au début puis après je me rend compte que la value de base n'est pas pris en compte lors du submit
+                    // elseif($key == 'image'){
+                    //     echo '
+                    //     <p>
+                    //     <label for="Update' .$key. 'Book_n°'.$id.'">'.$key. ': l\'image stocké est : ' .$value. '</label>
+                    //     <input type="file" name="Update' .$key. 'Book_n°'.$id.'" id="Update' .$key. 'Book_n°'.$id.'" maxlength="250" size="30" value="'.$value.'">
+                    //     </p>';
+                    // }
+                    //else pour faire un input classique de type text
+                    else {    
+                        echo '
+                        <p>
+                        <label for="Update' .$key. 'Book_n°'.$id.'">'.$key. '</label>
+                        <input type="text" name="Update' .$key. 'Book_n°'.$id.'" id="Update' .$key. 'Book_n°'.$id.'" maxlength="250" size="30" value="'.$value.'" required>
+                        </p>';
+                    }
+                }
+                
+                echo '<input type="submit" id="InputMAJ" name="InputMAJ" value="Mettre à jour">';
+                echo '<input type="submit" id="InputDELETE" name="InputDELETE" value="Supprimer">';
+                echo '</form>';
+            }
+            return 'miaou : '.$id ;
 };
 
-function ReadFormForUpdateAndDelete($NomArray) {
+$essaireturn = ReadFormForUpdateAndDelete();
+
     
-    foreach($NomArray as $key=>$value) {
-        foreach($value as $keyb=>$valueb) {
-            //on recup l'id du Livre pour l'insérer dans les futur name, id etc...
-            if($keyb == 'id') {
-                $idBook = $valueb;
-            }
-            //elseif pour faire un input de type date
-            elseif($keyb == 'date'){
-                echo '
-                <p>
-                <label for="Update' .$keyb. 'Book_n°'.$idBook.'">'.$keyb. '</label>
-                <input type="date" name="Update' .$keyb. 'Book_n°'.$idBook.'" id="Update' .$keyb. 'Book_n°'.$idBook.'" maxlength="250" size="30" value="'.$valueb.'" required>
-                </p>';   
-            }
-            //elseif pour faire un input de type number
-            elseif($keyb == 'prix'){
-                echo '
-                <p>
-                <label for="Update' .$keyb. 'Book_n°'.$idBook.'">'.$keyb. '</label>
-                <input type="number" name="Update' .$keyb. 'Book_n°'.$idBook.'" id="Update' .$keyb. 'Book_n°'.$idBook.'" maxlength="250" size="30" value="'.$valueb.'" required>
-                </p>';
-            }
-            //elseif pour faire un input de type file pour le fichier image :)
-            elseif($keyb == 'image'){
-                echo '
-                <p>
-                <label for="Update' .$keyb. 'Book_n°'.$idBook.'">'.$keyb. ': l\'image stocké est : ' .$valueb. '</label>
-                <input type="file" name="Update' .$keyb. 'Book_n°'.$idBook.'" id="Update' .$keyb. 'Book_n°'.$idBook.'" maxlength="250" size="30" value="'.$valueb.'" required>
-                </p>';
-            }
-            //else pour faire un input classique de type text
-            else {    
-                echo '
-                <p>
-                <label for="Update' .$keyb. 'Book_n°'.$idBook.'">'.$keyb. '</label>
-                <input type="text" name="Update' .$keyb. 'Book_n°'.$idBook.'" id="Update' .$keyb. 'Book_n°'.$idBook.'" maxlength="250" size="30" value="'.$valueb.'" required>
-                </p>';
-            }
-        }
-    }
-    echo '<input type="submit" value="Mettre à jour">';
-    echo '<input type="submit" value="Supprimer">';
-}
-    
-    
-$machin ="machin";
+
 
 
 /////function CRUD DELETE
@@ -359,4 +400,8 @@ function AffichageTableauAssocV4($NomArray){
 
     echo '</table>';
 }
+
+////////////// MOT DE PASSE CONNEXION ////////////
+
+
 ?>
